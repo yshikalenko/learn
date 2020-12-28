@@ -154,3 +154,7 @@ $ git config --global alias.st status
 Вы можете легко это увидеть при помощи простой команды git log, которая покажет вам куда указывают указатели веток. Эта опция называется --decorate.
 
 $ git log --oneline --decorate
+
+Команда для кэширования credentials
+
+$ git config --global credential.helper cache
