@@ -1,0 +1,156 @@
+C:\>git --version
+git version 2.29.2.windows.3
+
+yuri@yuri:~$ sudo apt-get install git
+
+yuri@yuri:~$ git --version
+git version 1.7.9.5
+
+
+!!!!!!! Use main instead master as default
+git config --global init.defaultBranch main
+
+
+C:\>git config --show-origin init.defaultBranch
+file:C:/Users/yuri/.gitconfig   main
+
+Вот ещё один пример файла .gitignore:
+
+# Исключить все файлы с расширение .a
+*.a
+
+# Но отслеживать файл lib.a даже если он подпадает под исключение выше
+!lib.a
+
+# Исключить файл TODO в корневой директории, но не файл в subdir/TODO
+/TODO
+
+# Игнорировать все файлы в директории build/
+build/
+
+# Игнорировать файл doc/notes.txt, но не файл doc/server/arch.txt
+doc/*.txt
+
+# Игнорировать все .txt файлы в директории doc/
+doc/**/*.txt
+
+
+GitHub поддерживает довольно полный список примеров .gitignore файлов для множества проектов и языков 
+https://github.com/github/gitignore 
+это может стать отправной точкой для .gitignore в вашем проекте.
+
+Используйте git diff для просмотра непроиндексированных изменений
+
+а так же git diff --cached для просмотра проиндексированных изменений (--staged и --cached синонимы):
+
+git diff --staged
+git diff --cached
+
+Добавление параметра -a в команду git commit заставляет Git автоматически индексировать каждый 
+уже отслеживаемый на момент коммита файл, позволяя вам обойтись без git add:
+
+yuri@yuri:/ldata/git/learn$ echo 'commit without git add: git commit -a' >> CONTRIBUTING.md
+yuri@yuri:/ldata/git/learn$ echo 'commit without git add: git commit -a' > CONTRI.md
+
+yuri@yuri:/ldata/git/learn$ git commit -a
+[master 88da2ba] the second commit using git commit -a
+ 1 file changed, 1 insertion(+)
+yuri@yuri:/ldata/git/learn$ git status
+# On branch master
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#       CONTRI.md
+
+CONTRIBUTING.md - есть в коммит потому что был уже отслеживаемый
+CONTRI.md - нет в commit потому что не был то есть не выполнялась git add
+
+
+$ git log --pretty=format:"%h - %an, %ar : %s"
+ca82a6d - Scott Chacon, 6 years ago : changed the version number
+085bb3b - Scott Chacon, 6 years ago : removed unnecessary test
+a11bef0 - Scott Chacon, 6 years ago : first commit 
+
+Последней полезной опцией, которую принимает команда git log как фильтр, является путь. Если вы укажете директорию или имя файла, вы ограничите вывод только теми коммитами, в которых были изменения этих файлов. Эта опция всегда указывается последней после двойного тире (--), что отделяет указываемый путь от опций.
+
+
+
+Таблица 3. Опции для ограничения вывода команды git log
+Опция   Описание
+-(n)
+
+Показывает только последние n коммитов.
+
+--since, --after
+
+Показывает только те коммиты, которые были сделаны после указанной даты.
+
+--until, --before
+
+Показывает только те коммиты, которые были сделаны до указанной даты.
+
+--author
+
+Показывает только те коммиты, в которых запись author совпадает с указанной строкой.
+
+--committer
+
+Показывает только те коммиты, в которых запись committer совпадает с указанной строкой.
+
+--grep
+
+Показывает только коммиты, сообщение которых содержит указанную строку.
+
+-S
+
+Показывает только коммиты, в которых изменение в коде повлекло за собой добавление или удаление указанной строки.
+
+
+Например, если вы хотите увидеть, в каких коммитах произошли изменения в тестовых файлах в исходном коде Git в октябре 2008 года, автором которых был Junio Hamano и которые не были коммитами слияния, вы можете запустить следующую команду:
+
+$ git log --pretty="%h - %s" --author=gitster --since="2008-10-01" \
+   --before="2008-11-01" --no-merges -- t/
+
+
+
+Отмена может потребоваться, если вы сделали коммит слишком рано, например, забыв добавить какие-то файлы или комментарий к коммиту. Если вы хотите переделать коммит — внесите необходимые изменения, добавьте их в индекс и сделайте коммит ещё раз, указав параметр --amend:
+
+$ git commit --amend
+
+Аннотированные метки
+Создание аннотированной метки в Git выполняется легко. Самый простой способ — это указать -a при выполнении команды tag:
+
+$ git tag -a v1.4 -m 'my version 1.4'
+$ git tag
+v0.1
+v1.3
+v1.4
+Опция -m задаёт сообщение, которое будет храниться вместе с тегом. Если не указать сообщение, то Git запустит редактор, чтобы вы смогли его ввести.
+
+С помощью команды git show вы можете посмотреть данные тега вместе с коммитом:
+
+$ git show v1.4
+tag v1.4
+Tagger: Ben Straub <ben@straub.cc>
+Date:   Sat May 3 20:19:12 2014 -0700
+
+my version 1.4
+
+commit ca82a6dff817ec66f44342007202690a93763949
+Author: Scott Chacon <schacon@gee-mail.com>
+Date:   Mon Mar 17 21:52:11 2008 -0700
+
+    changed the version number
+
+
+примеров псевдонимов, которые вы, возможно, захотите задать:
+
+$ git config --global alias.co checkout
+$ git config --global alias.br branch
+$ git config --global alias.ci commit
+$ git config --global alias.st status
+
+
+Вы можете легко это увидеть при помощи простой команды git log, которая покажет вам куда указывают указатели веток. Эта опция называется --decorate.
+
+$ git log --oneline --decorate
